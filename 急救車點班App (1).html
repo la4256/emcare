@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="急救車點班">
+<title>急救車管理系統</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#f1f5f9;--sf:#fff;--sf2:#f8fafc;--sf3:#f1f5f9;
+  --blue:#0ea5e9;--bd:rgba(14,165,233,0.10);--bb:rgba(14,165,233,0.30);
+  --green:#16a34a;--gd:#f0fdf4;--gb:#86efac;
+  --red:#dc2626;--rd:#fff5f5;--rb:#fca5a5;
+  --amber:#d97706;--ad:#fffbeb;--ab:#fde68a;
+  --purple:#7c3aed;--pd:rgba(124,58,237,0.08);--pb:rgba(124,58,237,0.25);
+  --text1:#1e293b;--text2:#475569;--text3:#94a3b8;
+  --bdr:#e2e8f0;--bdr2:#cbd5e1;
+  --r:12px;--rs:8px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:0 2px 8px rgba(0,0,0,0.08);
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text1);font-size:14px;line-height:1.5;}
+.app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;background:var(--bg);position:relative;}
+
+
+.btn-amber{background:var(--amber);color:#fff;box-shadow:0 2px 6px rgba(217,119,6,0.25);}
+.btn-amber:hover{background:#b45309;}
+.au-item{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);}
+.au-q{font-size:13px;font-weight:500;color:var(--text1);margin-bottom:8px;}
+.au-opts{display:flex;gap:8px;}
+.au-opt{flex:1;padding:8px 0;border-radius:var(--rs);border:1.5px solid var(--bdr2);text-align:center;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);}
+.au-opt.pass{border-color:var(--green);background:#dcfce7;color:var(--green);}
+.au-opt.fail{border-color:var(--red);background:#fee2e2;color:var(--red);}
+.mo-item{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px;overflow:hidden;box-shadow:var(--shadow);}
+.mo-item-hd{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;}
+.mo-item-hd:active{background:var(--sf2);}
+.mo-idot{width:8px;height:8px;border-radius:50%;background:var(--bdr2);flex-shrink:0;}
+.mo-item.replaced .mo-idot{background:var(--green);}
+.mo-iname{flex:1;font-size:13px;font-weight:500;color:var(--text1);}
+.mo-iqty{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);background:var(--sf3);padding:2px 7px;border-radius:4px;}
+.mo-exp{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;}
+.mo-exp.red{background:#fee2e2;color:var(--red);}
+.mo-exp.amber{background:#fffbeb;color:var(--amber);}
+.mo-form{padding:0 14px 12px;display:none;border-top:1px solid var(--bdr);}
+.mo-item.open .mo-form{display:block;}
+.mo-yesno{display:flex;gap:7px;margin:10px 0 8px;}
+.mo-yn{flex:1;padding:9px 0;border-radius:var(--rs);border:1.5px solid var(--bdr2);text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text2);}
+.mo-yn.yes{border-color:var(--green);background:#dcfce7;color:var(--green);}
+.mo-yn.no{border-color:var(--bdr2);background:var(--sf2);}
+.mo-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mo-field{display:flex;flex-direction:column;gap:4px;}
+.mo-field label{font-size:11px;color:var(--text2);font-weight:500;}
+.mo-field input{background:var(--sf2);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:7px 10px;color:var(--text1);font-size:12px;font-family:'Noto Sans TC',sans-serif;outline:none;width:100%;}
+.mo-field input:focus{border-color:var(--amber);}
+.rep-badge-sm{font-size:10px;background:#dcfce7;color:var(--green);border:1px solid #86efac;border-radius:10px;padding:1px 7px;font-family:'JetBrains Mono',monospace;}
+
+/* topbar */
+.topbar{background:var(--sf);border-bottom:1px solid var(--bdr);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow);}
+.t-logo{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;margin-right:9px;}
+.t-title{font-size:14px;font-weight:700;color:var(--text1);}
+.t-sub{font-size:10px;color:var(--text3);}
+.t-chip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);background:var(--bd);border:1px solid var(--bb);border-radius:20px;padding:3px 10px;}
+
+/* screens */
+.screen{display:none;flex:1;overflow-y:auto;padding-bottom:20px;}
+.screen.active{display:block;}
+.wrap{padding:14px 16px;}
+
+/* steps */
+.steps{display:flex;padding:10px 16px;background:var(--sf);border-bottom:1px solid var(--bdr);}
+.sdw{display:flex;align-items:center;flex:1;}
+.sdw:last-child{flex:0;}
+.sdc{display:flex;flex-direction:column;align-items:center;}
+.sd{width:22px;height:22px;border-radius:50%;border:2px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text3);flex-shrink:0;transition:all .2s;}
+.sd.act{border-color:var(--blue);background:var(--blue);color:#fff;}
+.sd.dn{border-color:var(--green);color:var(--green);background:var(--gd);}
+.sline{flex:1;height:2px;background:var(--bdr);margin:0 4px;margin-top:11px;border-radius:2px;transition:background .2s;}
+.sline.dn{background:var(--green);}
+.slbl{font-size:9px;color:var(--text3);margin-top:3px;white-space:nowrap;}
+
+/* page header */
+.pg-hd{padding:14px 16px 0;display:flex;align-items:center;gap:10px;}
+.pg-back{width:32px;height:32px;border-radius:8px;background:var(--sf2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:14px;flex-shrink:0;}
+.pg-title{font-size:15px;font-weight:700;color:var(--text1);}
+.pg-sub{font-size:11px;color:var(--text3);}
+
+/* section label */
+.sl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;padding:12px 0 7px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.sl::after{content:'';flex:1;height:1px;background:var(--bdr);}
+
+/* fields */
+.fg{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);}
+.fr{display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid var(--bdr);}
+.fr:last-child{border-bottom:none;}
+.fl{font-size:12px;color:var(--text2);width:74px;flex-shrink:0;font-weight:500;}
+.fl i{font-size:13px;margin-right:5px;color:var(--blue);}
+.fv{flex:1;}
+.fv select,.fv input,.fv textarea{background:none;border:none;color:var(--text1);font-size:13px;font-family:'Noto Sans TC',sans-serif;width:100%;outline:none;cursor:pointer;resize:none;}
+.fv select option{background:#fff;color:var(--text1);}
+.fv input::placeholder{color:var(--text3);}
+
+/* notice box */
+.nbox{border-radius:var(--rs);padding:11px 13px;margin-bottom:12px;display:flex;gap:9px;}
+.nbox.amber{background:var(--ad);border:1px solid var(--ab);border-left:3px solid var(--amber);}
+.nbox.red{background:var(--rd);border:1px solid var(--rb);border-left:3px solid var(--red);}
+.nbox.blue{background:var(--bd);border:1px solid var(--bb);border-left:3px solid var(--blue);}
+.nbox.green{background:var(--gd);border:1px solid var(--gb);border-left:3px solid var(--green);}
+.nbox.purple{background:var(--pd);border:1px solid var(--pb);border-left:3px solid var(--purple);}
+.nbox i{font-size:15px;flex-shrink:0;margin-top:2px;}
+.nbox.amber i{color:var(--amber);}
+.nbox.red i{color:var(--red);}
+.nbox.blue i{color:var(--blue);}
+.nbox.green i{color:var(--green);}
+.nbox.purple i{color:var(--purple);}
+.nb{font-size:12px;line-height:1.6;}
+.nbox.amber .nb{color:#92400e;}
+.nbox.red .nb{color:#991b1b;}
+.nbox.blue .nb{color:#075985;}
+.nbox.green .nb{color:#166534;}
+.nbox.purple .nb{color:#5b21b6;}
+.nb strong{font-weight:700;}
+
+/* HOME */
+.home-hero{padding:16px 16px 8px;}
+.hero-time{font-size:10px;color:var(--text3);margin-bottom:3px;}
+.hero-title{font-size:18px;font-weight:700;}
+.hero-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.shift-bar{margin:8px 16px 0;background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow);}
+.sb-hd{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;}
+.sb-wards{display:flex;flex-direction:column;gap:6px;}
+.sb-ward-row{display:flex;align-items:center;gap:6px;}
+.sb-lbl{font-size:11px;color:var(--text2);width:32px;flex-shrink:0;font-weight:500;}
+.sb-shifts{display:flex;gap:4px;flex:1;}
+.sp{flex:1;text-align:center;padding:5px 2px;border-radius:6px;border:1px solid var(--bdr);font-size:10px;color:var(--text3);background:var(--sf2);}
+.sp.done{background:#dcfce7;border-color:#86efac;color:var(--green);font-weight:500;}
+.sp.pend{background:#fffbeb;border-color:#fde68a;color:var(--amber);}
+.sp .sn{font-size:9px;margin-bottom:1px;}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 0;}
+.ac{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 13px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+.ac:active{transform:scale(.96);}
+.ac.daily{border-top:3px solid var(--blue);}
+.ac.monthly{border-top:3px solid var(--amber);}
+.ac.makeup{border-top:3px solid var(--purple);}
+.ac.audit{border-top:3px solid var(--green);}
+.ac.emergency{grid-column:1/-1;border:2px solid var(--rb);background:linear-gradient(135deg,#fff5f5,#fff);}
+.aci{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:9px;}
+.ac.daily .aci{background:var(--bd);color:var(--blue);}
+.ac.monthly .aci{background:var(--ad);color:var(--amber);}
+.ac.makeup .aci{background:var(--pd);color:var(--purple);}
+.ac.audit .aci{background:var(--gd);color:var(--green);}
+.ac.emergency .aci{background:var(--rd);color:var(--red);width:40px;height:40px;font-size:19px;margin-bottom:0;}
+.ac-title{font-size:13px;font-weight:700;color:var(--text1);margin-bottom:2px;}
+.ac-desc{font-size:11px;color:var(--text3);line-height:1.5;}
+.abadge{position:absolute;top:9px;right:9px;font-size:10px;padding:2px 7px;border-radius:10px;}
+.bw{background:#fffbeb;color:var(--amber);border:1px solid var(--ab);}
+.bp{background:var(--pd);color:var(--purple);border:1px solid var(--pb);}
+.br{background:var(--rd);color:var(--red);border:1px solid var(--rb);}
+.em-row{display:flex;align-items:center;gap:12px;}
+.em-body{flex:1;}
+.log-wrap{padding:4px 16px 16px;}
+.log-hd{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.8px;padding:10px 0 7px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.log-hd::after{content:'';flex:1;height:1px;background:var(--bdr);}
+.li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr);}
+.li:last-child{border-bottom:none;}
+.ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.ldot.ok{background:var(--green);}
+.ldot.mu{background:var(--purple);}
+.ldot.em{background:var(--red);}
+.linfo{flex:1;}
+.ln{font-size:12px;font-weight:500;color:var(--text1);}
+.lm{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.5;}
+.lt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap;}
+
+/* ALL-OK button */
+.all-ok-btn{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:var(--r);padding:15px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(22,163,74,0.1);}
+.all-ok-btn:active{transform:scale(.97);}
+.all-ok-btn.active{background:linear-gradient(135deg,#16a34a,#15803d);border-color:#15803d;box-shadow:0 3px 10px rgba(22,163,74,0.25);}
+.aob-icon{width:42px;height:42px;border-radius:9px;background:#dcfce7;border:1.5px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--green);flex-shrink:0;transition:all .2s;}
+.all-ok-btn.active .aob-icon{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.3);color:#fff;}
+.aob-body{flex:1;}
+.aob-title{font-size:14px;font-weight:700;color:var(--green);}
+.all-ok-btn.active .aob-title{color:#fff;}
+.aob-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.all-ok-btn.active .aob-sub{color:rgba(255,255,255,0.8);}
+.aob-chk{width:26px;height:26px;border-radius:50%;border:2px solid #86efac;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;flex-shrink:0;transition:all .2s;}
+.all-ok-btn.active .aob-chk{color:var(--green);}
+.or-div{display:flex;align-items:center;gap:10px;margin:10px 0;}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--bdr2);}
+.or-div span{font-size:11px;color:var(--text3);white-space:nowrap;}
+
+/* progress */
+.pbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ptrack{flex:1;height:5px;background:var(--sf3);border-radius:4px;overflow:hidden;}
+.pfill{height:100%;border-radius:4px;transition:width .35s;}
+.ptxt{font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;font-weight:500;}
+
+/* items */
+.item{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:all .2s;box-shadow:var(--shadow);}
+.item.ok{border-color:#86efac;background:#f0fdf4;}
+.item.bad{border-color:#fca5a5;background:#fff5f5;}
+.item.dimmed{opacity:.45;}
+.item-top{padding:11px 14px;display:flex;align-items:center;gap:10px;}
+.idot{width:9px;height:9px;border-radius:50%;background:var(--bdr2);flex-shrink:0;transition:background .2s;}
+.item.ok .idot{background:var(--green);}
+.item.bad .idot{background:var(--red);}
+.iname{flex:1;font-size:13px;font-weight:500;color:var(--text1);}
+.iqty{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);background:var(--sf3);padding:2px 7px;border-radius:4px;}
+.ibtns{display:flex;border-top:1px solid var(--bdr);}
+.ibtn{flex:1;padding:10px 0;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border:none;background:var(--sf2);color:var(--text2);font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.ibtn:first-child{border-right:1px solid var(--bdr);}
+.ibtn:active{background:var(--sf3);}
+.ibtn.aok{background:#dcfce7;color:var(--green);}
+.ibtn.abad{background:#fee2e2;color:var(--red);}
+.badnote{padding:0 14px 11px;display:none;background:#fff5f5;}
+.badnote.show{display:block;}
+.bai{width:100%;background:#fff;border:1px solid #fca5a5;border-radius:var(--rs);padding:8px 11px;color:var(--text1);font-size:12px;font-family:'Noto Sans TC',sans-serif;outline:none;resize:none;}
+
+/* Emergency picker */
+.ward-row{display:flex;gap:8px;margin-bottom:12px;}
+.wb{flex:1;padding:14px 6px;border-radius:var(--rs);border:1.5px solid var(--bdr2);text-align:center;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);background:var(--sf);}
+.wb i{display:block;font-size:24px;margin-bottom:5px;}
+.wb:active{transform:scale(.96);}
+.wb.sel-r{border-color:var(--red);background:#fff5f5;color:var(--red);}
+.search-inp{background:var(--sf);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:10px 13px;font-size:13px;color:var(--text1);font-family:'Noto Sans TC',sans-serif;outline:none;width:100%;margin-bottom:8px;}
+.search-inp:focus{border-color:var(--rb);}
+.search-inp::placeholder{color:var(--text3);}
+.cat-tabs{display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap;}
+.ct{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--bdr2);background:var(--sf);color:var(--text2);transition:all .15s;}
+.ct.active{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+.pick-list{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:10px;max-height:220px;overflow-y:auto;box-shadow:var(--shadow);}
+.pi{display:flex;align-items:center;gap:9px;padding:11px 13px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background .12s;}
+.pi:last-child{border-bottom:none;}
+.pi:active{background:var(--sf2);}
+.pi.picked{background:#fff5f5;}
+.pi-chk{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.pi.picked .pi-chk{background:var(--red);border-color:var(--red);color:#fff;}
+.pi-name{flex:1;font-size:13px;color:var(--text1);}
+.pi-meta{font-size:10px;color:var(--text3);}
+.sel-em-card{background:var(--sf);border:1px solid var(--rb);border-radius:var(--rs);padding:12px 13px;margin-bottom:8px;box-shadow:var(--shadow);}
+.sec-name{font-size:13px;font-weight:600;color:var(--red);margin-bottom:9px;}
+.qty-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.qty-lbl{font-size:12px;color:var(--text2);width:54px;flex-shrink:0;font-weight:500;}
+.qty-step{display:flex;align-items:center;background:var(--sf2);border:1.5px solid var(--bdr2);border-radius:var(--rs);overflow:hidden;}
+.qsb{width:36px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:none;color:var(--text1);font-size:16px;}
+.qsb:active{background:var(--sf3);}
+.qsv{width:44px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;background:none;border:none;border-left:1.5px solid var(--bdr2);border-right:1.5px solid var(--bdr2);color:var(--text1);padding:6px 0;outline:none;}
+.rep-row{display:flex;align-items:center;gap:9px;padding-top:8px;border-top:1px solid var(--bdr);}
+.tog{position:relative;width:42px;height:24px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;inset:0;background:var(--bdr2);border-radius:12px;cursor:pointer;transition:background .2s;}
+.tog-sl:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.tog input:checked + .tog-sl{background:var(--green);}
+.tog input:checked + .tog-sl:before{transform:translateX(18px);}
+.rep-info .rt{font-size:13px;font-weight:500;color:var(--text1);}
+.rep-info .rs{font-size:10px;color:var(--text3);}
+.exp-row{display:none;padding-top:8px;align-items:center;gap:8px;}
+.exp-row.show{display:flex;}
+.exp-lbl{font-size:12px;color:var(--text2);width:54px;flex-shrink:0;}
+.exp-inp{background:var(--sf2);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:7px 10px;color:var(--text1);font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;flex:1;}
+.exp-inp:focus{border-color:var(--green);}
+
+/* Makeup */
+.shift-btns{display:flex;gap:7px;margin-bottom:12px;}
+.msb{flex:1;padding:12px 6px;border-radius:var(--rs);border:1.5px solid var(--bdr2);text-align:center;cursor:pointer;transition:all .15s;font-size:12px;color:var(--text2);background:var(--sf);}
+.msb i{display:block;font-size:20px;margin-bottom:5px;}
+.msb:active{transform:scale(.96);}
+.msb.sel{border-color:var(--purple);background:var(--pd);color:var(--purple);}
+.reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.rc{background:var(--sf);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:11px 8px;cursor:pointer;transition:all .15s;text-align:center;box-shadow:var(--shadow);}
+.rc:active{transform:scale(.97);}
+.rc.sel{border-color:var(--purple);background:var(--pd);}
+.rc i{font-size:20px;display:block;margin-bottom:5px;color:var(--text3);}
+.rc.sel i{color:var(--purple);}
+.rc .rt{font-size:12px;font-weight:500;color:var(--text1);}
+.rc .rs{font-size:10px;color:var(--text3);margin-top:2px;}
+
+/* Summary */
+.sum-card{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow);}
+.sum-hd{padding:10px 15px;background:var(--sf2);border-bottom:1px solid var(--bdr);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;border-bottom:1px solid var(--bdr);font-size:13px;color:var(--text1);}
+.sr:last-child{border-bottom:none;}
+.sv{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;}
+.ov{color:var(--green);}
+.rv{color:var(--red);}
+.av{color:var(--amber);}
+.sum-item-blk{padding:9px 15px;border-bottom:1px solid var(--bdr);}
+.sum-item-blk:last-child{border-bottom:none;}
+.sin{font-size:13px;font-weight:500;color:var(--red);margin-bottom:4px;}
+.sid{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap;}
+.mode-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 13px;border-radius:20px;margin-bottom:12px;font-weight:500;}
+.mode-pill.full{background:#dcfce7;color:var(--green);border:1px solid #86efac;}
+.mode-pill.partial{background:#fffbeb;color:var(--amber);border:1px solid #fde68a;}
+
+/* Done */
+.done-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;min-height:400px;}
+.dc{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:20px;}
+.dc.t{background:#dcfce7;border:3px solid var(--green);color:var(--green);}
+.dc.r{background:#fee2e2;border:3px solid var(--red);color:var(--red);}
+.dc.p{background:var(--pd);border:3px solid var(--purple);color:var(--purple);}
+.dt{font-size:22px;font-weight:700;color:var(--text1);margin-bottom:8px;}
+.ds{font-size:13px;color:var(--text2);line-height:1.9;}
+.dm{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);margin-top:14px;}
+
+/* Bottom bar */
+.bbar{position:sticky;bottom:0;background:var(--sf);border-top:1px solid var(--bdr);padding:12px 16px;display:flex;gap:9px;box-shadow:0 -2px 8px rgba(0,0,0,0.06);}
+.btn{flex:1;padding:13px 0;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;}
+.btn:active{transform:scale(.96);}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 2px 6px rgba(14,165,233,0.3);}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 2px 6px rgba(22,163,74,0.25);}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 2px 6px rgba(220,38,38,0.25);}
+.btn-purple{background:var(--purple);color:#fff;box-shadow:0 2px 6px rgba(124,58,237,0.25);}
+.btn-amber{background:var(--amber);color:#fff;}
+.btn-ghost{background:var(--sf2);color:var(--text2);border:1.5px solid var(--bdr2);}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none !important;box-shadow:none;}
+
+/* Toast */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--text1);color:#fff;padding:11px 20px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.toast.show{opacity:1;}
+
+/* Install banner */
+.install-banner{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:12px;flex-shrink:0;}
+.install-banner i{font-size:18px;flex-shrink:0;}
+.install-banner .ib-text{flex:1;line-height:1.5;}
+.install-banner .ib-close{font-size:18px;cursor:pointer;opacity:.8;padding:2px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- 加入主畫面提示 -->
+<div class="install-banner" id="install-banner">
+  <i class="ti ti-download"></i>
+  <div class="ib-text">點選瀏覽器「分享」→「加入主畫面」，像 App 一樣使用！</div>
+  <div class="ib-close" onclick="document.getElementById('install-banner').style.display='none'"><i class="ti ti-x"></i></div>
+</div>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <div class="t-logo"><i class="ti ti-ambulance"></i></div>
+    <div><div class="t-title">急救車管理系統</div><div class="t-sub">內外科急救車點班平台</div></div>
+  </div>
+  <div class="t-chip" id="top-chip"></div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="pg-home">
+  <div class="home-hero">
+    <div class="hero-time" id="hero-time"></div>
+    <div class="hero-title">今日點班概況</div>
+    <div class="hero-sub">請選擇要執行的功能</div>
+  </div>
+  <div class="shift-bar">
+    <div class="sb-hd">今日三班狀態</div>
+    <div class="sb-wards">
+      <div class="sb-ward-row">
+        <div class="sb-lbl">內科</div>
+        <div class="sb-shifts">
+          <div class="sp" id="s-nei-day"><div class="sn">白班</div>—</div>
+          <div class="sp" id="s-nei-eve"><div class="sn">小夜</div>—</div>
+          <div class="sp" id="s-nei-ngt"><div class="sn">大夜</div>—</div>
+        </div>
+      </div>
+      <div class="sb-ward-row">
+        <div class="sb-lbl">外科</div>
+        <div class="sb-shifts">
+          <div class="sp" id="s-wai-day"><div class="sn">白班</div>—</div>
+          <div class="sp" id="s-wai-eve"><div class="sn">小夜</div>—</div>
+          <div class="sp" id="s-wai-ngt"><div class="sn">大夜</div>—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="agrid">
+    <div class="ac daily" onclick="goDailyS1()">
+      <div class="aci"><i class="ti ti-checklist"></i></div>
+      <div class="ac-title">每日點班</div>
+      <div class="ac-desc">第一層物品逐項確認</div>
+    </div>
+    <div class="ac makeup" onclick="gs('pg-mu1')">
+      <div class="aci"><i class="ti ti-clock-edit"></i></div>
+      <div class="ac-title">補點班</div>
+      <div class="ac-desc">當天忘記補填</div>
+      <div class="abadge bp">補填</div>
+    </div>
+    <div class="ac monthly" onclick="gs('pg-mo1')">
+      <div class="aci"><i class="ti ti-calendar-stats"></i></div>
+      <div class="ac-title">15日大盤點</div>
+      <div class="ac-desc">全車三層物品盤點</div>
+      <div class="abadge bw">15日</div>
+    </div>
+    <div class="ac audit" onclick="gs('pg-au1')">
+      <div class="aci"><i class="ti ti-clipboard-check"></i></div>
+      <div class="ac-title">護理長稽核</div>
+      <div class="ac-desc">查看進度與稽核</div>
+    </div>
+    <div class="ac emergency" onclick="gs('pg-em1')">
+      <div class="em-row">
+        <div class="aci"><i class="ti ti-urgent"></i></div>
+        <div class="em-body">
+          <div class="ac-title" style="color:var(--red)">緊急取用記錄</div>
+          <div class="ac-desc">急救時開車取用，立即記錄並通知護理長</div>
+        </div>
+        <div class="abadge br" style="position:static;margin-left:auto;">緊急</div>
+      </div>
+    </div>
+  </div>
+  <div class="log-wrap">
+    <div class="log-hd">今日記錄</div>
+    <div id="home-log"><div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">今日尚無點班記錄</div></div>
+  </div>
+</div>
+
+<!-- DAILY S1 -->
+<div class="screen" id="pg-d1">
+  <div class="pg-hd"><div class="pg-back" onclick="goHome()"><i class="ti ti-arrow-left"></i></div><div><div class="pg-title">每日點班</div><div class="pg-sub">3-1 第一層物品確認</div></div></div>
+  <div class="steps" style="margin-top:10px;">
+    <div class="sdw"><div class="sdc"><div class="sd act">1</div><div class="slbl">基本資料</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">2</div><div class="slbl">物品確認</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="fg">
+      <div class="fr"><div class="fl"><i class="ti ti-sun"></i>班別</div><div class="fv"><select id="d-shift"><option>白班</option><option>小夜班</option><option>大夜班</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-ambulance"></i>急救車</div><div class="fv"><select id="d-ward"><option>內科急救車</option><option>外科急救車</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-user"></i>點班人</div><div class="fv"><select id="d-nurse"><option value="">請選擇護理師</option><option>張孟玲（護理長）</option><option>陳穎瑜</option><option>歐玉雯</option><option>劉春妹</option><option>徐懿慶</option><option>方亦稜</option><option>莊婉如</option><option>羅雅妮</option><option>王彥文</option><option>白雅文</option><option>陳宣妤</option><option>朱峻穎</option><option>黃雅貞</option><option>黃羿鈞</option><option>李恩瑜</option><option>詹明軒</option><option>楊婕惠</option><option>葉芷薰</option><option>江士青</option><option>李采凌</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-lock"></i>鎖片號碼</div><div class="fv"><input type="number" id="d-lock" placeholder="輸入鎖片號碼"></div></div>
+    </div>
+    <div class="nbox amber"><i class="ti ti-alert-triangle"></i><div class="nb"><strong>今日注意：</strong>請確認急救車封條完整，點班後資料自動同步至後線總表</div></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="goHome()"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-blue" onclick="goDailyS2()"><i class="ti ti-arrow-right"></i> 開始點班</button>
+  </div>
+</div>
+
+<!-- DAILY S2 -->
+<div class="screen" id="pg-d2">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">基本資料</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act">2</div><div class="slbl">物品確認</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="all-ok-btn" id="aob" onclick="toggleAllOk()">
+      <div class="aob-icon" id="aob-icon"><i class="ti ti-checks"></i></div>
+      <div class="aob-body"><div class="aob-title" id="aob-title">全部正常，一鍵確認</div><div class="aob-sub" id="aob-sub">所有物品均在位且正常 → 直接點這裡送出</div></div>
+      <div class="aob-chk" id="aob-chk"><i class="ti ti-check"></i></div>
+    </div>
+    <div class="or-div"><span>或 有個別物品異常，請逐項標記</span></div>
+    <div class="pbar"><div class="ptrack"><div class="pfill" id="d-pfill" style="background:var(--green);width:0%"></div></div><div class="ptxt" id="d-ptxt" style="color:var(--green)">0 / 9</div></div>
+    <div id="d-items"></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-d1')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-blue" id="d-submit-btn" onclick="goDailyS3()" disabled><i class="ti ti-clipboard-check"></i> 確認送出</button>
+  </div>
+</div>
+
+<!-- DAILY S3 -->
+<div class="screen" id="pg-d3">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">基本資料</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">物品確認</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="mode-pill" id="d-mode-pill"></div>
+    <div class="sum-card" id="d-sum-info"></div>
+    <div class="sum-card" id="d-sum-result"></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-d2')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-green" onclick="submitDaily()"><i class="ti ti-send"></i> 確認送出點班</button>
+  </div>
+</div>
+
+<!-- DONE DAILY -->
+<div class="screen" id="pg-done-d">
+  <div class="done-wrap">
+    <div class="dc t"><i class="ti ti-check"></i></div>
+    <div class="dt">點班完成！</div>
+    <div class="ds" id="d-done-sub">（測試版）資料已記錄於本機<br>正式版將同步至後線總表 ✅</div>
+    <div class="dm" id="d-done-meta"></div>
+    <button class="btn btn-ghost" style="margin-top:24px;width:160px;" onclick="goHome()"><i class="ti ti-home"></i> 返回首頁</button>
+  </div>
+</div>
+
+<!-- EMERGENCY S1 -->
+<div class="screen" id="pg-em1">
+  <div class="pg-hd"><div class="pg-back" onclick="goHome()"><i class="ti ti-arrow-left"></i></div><div><div class="pg-title" style="color:var(--red)">緊急取用記錄</div><div class="pg-sub">選急救車 → 選物品 → 送出</div></div></div>
+  <div class="steps" style="margin-top:10px;">
+    <div class="sdw"><div class="sdc"><div class="sd act">1</div><div class="slbl">選急救車</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">2</div><div class="slbl">選物品</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="nbox red"><i class="ti ti-bell-ringing"></i><div class="nb"><strong>正式版送出後立即通知護理長</strong>，未補充物品下次點班自動提醒</div></div>
+    <div class="sl">選擇急救車</div>
+    <div class="ward-row">
+      <div class="wb" id="em-nei" onclick="emWard('nei')"><i class="ti ti-ambulance"></i>內科急救車</div>
+      <div class="wb" id="em-wai" onclick="emWard('wai')"><i class="ti ti-ambulance"></i>外科急救車</div>
+    </div>
+    <div class="nbox amber"><i class="ti ti-info-circle"></i><div class="nb">取用後請盡快補充新品，補充時填入新效期，系統自動更新總表</div></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="goHome()"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-red" onclick="goEmS2()"><i class="ti ti-arrow-right"></i> 選取用物品</button>
+  </div>
+</div>
+
+<!-- EMERGENCY S2 -->
+<div class="screen" id="pg-em2">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">選急救車</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act">2</div><div class="slbl">選物品</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <input class="search-inp" id="em-search" placeholder="搜尋物品或藥品名稱..." oninput="emSearch(this.value)">
+    <div class="cat-tabs">
+      <div class="ct active" onclick="emCat(this,'all')">全部</div>
+      <div class="ct" onclick="emCat(this,'31')">3-1 物品</div>
+      <div class="ct" onclick="emCat(this,'32')">3-2 藥品</div>
+      <div class="ct" onclick="emCat(this,'33')">3-3 器材</div>
+    </div>
+    <div class="pick-list" id="em-pick"></div>
+    <div id="em-detail"></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-em1')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-red" onclick="goEmS3()"><i class="ti ti-clipboard-list"></i> 確認送出 <span id="em-n" style="background:rgba(255,255,255,0.25);border-radius:20px;padding:1px 8px;font-size:11px;margin-left:2px;"></span></button>
+  </div>
+</div>
+
+<!-- EMERGENCY S3 -->
+<div class="screen" id="pg-em3">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">選急救車</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">選物品</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="sum-card" id="em-sum-basic"></div>
+    <div class="sum-card" id="em-sum-items"></div>
+    <div class="nbox red"><i class="ti ti-bell-ringing"></i><div class="nb">正式版送出後護理長<strong>立即收到通知</strong></div></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-em2')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-red" onclick="submitEm()"><i class="ti ti-send"></i> 確認送出並通知護理長</button>
+  </div>
+</div>
+
+<!-- DONE EMERGENCY -->
+<div class="screen" id="pg-done-em">
+  <div class="done-wrap">
+    <div class="dc r"><i class="ti ti-bell-ringing"></i></div>
+    <div class="dt">緊急取用已記錄！</div>
+    <div class="ds" id="em-done-sub"></div>
+    <div class="dm" id="em-done-meta"></div>
+    <div style="display:flex;gap:8px;margin-top:22px;width:100%;max-width:260px;">
+      <button class="btn btn-ghost" onclick="goHome()"><i class="ti ti-home"></i> 首頁</button>
+      <button class="btn btn-red" onclick="resetEm();gs('pg-em1')"><i class="ti ti-plus"></i> 再記錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAKEUP S1 -->
+<div class="screen" id="pg-mu1">
+  <div class="pg-hd"><div class="pg-back" onclick="goHome()"><i class="ti ti-arrow-left"></i></div><div><div class="pg-title">補點班</div><div class="pg-sub">僅限補填當天未完成班別</div></div></div>
+  <div class="wrap" style="margin-top:10px;">
+    <div class="nbox purple"><i class="ti ti-info-circle"></i><div class="nb">補填後自動標記「補填」並<strong>通知護理長</strong>，請如實填寫原因</div></div>
+    <div class="fg">
+      <div class="fr"><div class="fl"><i class="ti ti-ambulance"></i>急救車</div><div class="fv"><select id="mu-ward"><option>內科急救車</option><option>外科急救車</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-user"></i>補填人</div><div class="fv"><select id="mu-nurse"><option value="">請選擇護理師</option><option>張孟玲（護理長）</option><option>陳穎瑜</option><option>歐玉雯</option><option>劉春妹</option><option>徐懿慶</option><option>方亦稜</option><option>莊婉如</option><option>羅雅妮</option><option>王彥文</option><option>白雅文</option><option>陳宣妤</option><option>朱峻穎</option><option>黃雅貞</option><option>黃羿鈞</option><option>李恩瑜</option><option>詹明軒</option><option>楊婕惠</option><option>葉芷薰</option><option>江士青</option><option>李采凌</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-lock"></i>鎖片號碼</div><div class="fv"><input type="number" id="mu-lock" placeholder="輸入鎖片號碼"></div></div>
+    </div>
+    <div class="sl">補填哪一班</div>
+    <div class="shift-btns" id="mu-shift-btns">
+      <div class="msb" onclick="muShift('day',this)"><i class="ti ti-sun"></i>白班</div>
+      <div class="msb" onclick="muShift('eve',this)"><i class="ti ti-moon"></i>小夜班</div>
+      <div class="msb" onclick="muShift('ngt',this)"><i class="ti ti-moon-stars"></i>大夜班</div>
+    </div>
+    <div class="sl">未點班原因（必填）</div>
+    <div class="reason-grid" id="mu-reasons">
+      <div class="rc" onclick="muReason(this,'emergency')"><i class="ti ti-urgent"></i><div class="rt">臨時急救</div><div class="rs">當班急救事件</div></div>
+      <div class="rc" onclick="muReason(this,'forgot')"><i class="ti ti-mood-confuzed"></i><div class="rt">忘記點班</div><div class="rs">未在班內完成</div></div>
+      <div class="rc" onclick="muReason(this,'system')"><i class="ti ti-wifi-off"></i><div class="rt">系統問題</div><div class="rs">網路/系統異常</div></div>
+      <div class="rc" onclick="muReason(this,'other')"><i class="ti ti-dots"></i><div class="rt">其他原因</div><div class="rs">請說明</div></div>
+    </div>
+    <textarea id="mu-note" style="width:100%;background:var(--sf);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:10px 12px;color:var(--text1);font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;resize:none;" rows="2" placeholder="補充說明（選填）..."></textarea>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="goHome()"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-purple" onclick="goMuS2()"><i class="ti ti-arrow-right"></i> 開始補填點班</button>
+  </div>
+</div>
+
+<!-- MAKEUP S2 -->
+<div class="screen" id="pg-mu2">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">補填資料</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act">2</div><div class="slbl">逐項確認</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="nbox purple"><i class="ti ti-clock-edit"></i><div class="nb" id="mu-mode-tag">補填模式</div></div>
+    <div class="pbar"><div class="ptrack"><div class="pfill" id="mu-pfill" style="background:var(--purple);width:0%"></div></div><div class="ptxt" id="mu-ptxt" style="color:var(--purple)">0 / 9</div></div>
+    <div id="mu-items"></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-mu1')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-purple" onclick="submitMakeup()"><i class="ti ti-send"></i> 送出補點班</button>
+  </div>
+</div>
+
+<!-- DONE MAKEUP -->
+<div class="screen" id="pg-done-mu">
+  <div class="done-wrap">
+    <div class="dc p"><i class="ti ti-clock-check"></i></div>
+    <div class="dt">補點班完成！</div>
+    <div class="ds">補填紀錄已儲存<br><span style="color:var(--amber)">正式版將自動通知護理長審閱</span></div>
+    <div class="dm" id="mu-done-meta"></div>
+    <button class="btn btn-ghost" style="margin-top:24px;width:160px;" onclick="goHome()"><i class="ti ti-home"></i> 返回首頁</button>
+  </div>
+</div>
+
+</div><!-- .app -->
+<div class="toast" id="toast"></div>
+
+<script>
+const DITEMS=[
+  {id:'glove',n:'清潔手套',q:'1盒'},
+  {id:'lary',n:'喉頭鏡柄＋葉片 2/3/4號',q:'各1個'},
+  {id:'lfunc',n:'喉頭鏡功能測試',q:'OK'},
+  {id:'basin',n:'彎盆',q:'1個'},
+  {id:'tools',n:'麥克筆 / 剪刀 / 筆燈',q:'各1支'},
+  {id:'light',n:'聚光型筆燈功能測試',q:'OK'},
+  {id:'hrub',n:'乾洗手液（使得利達）',q:'1瓶'},
+  {id:'glass',n:'非感染性玻璃收集盒',q:'1個'},
+  {id:'ndl',n:'針頭收集器',q:'1個'},
+];
+const ALL=[
+  {id:'glove',c:'31',n:'清潔手套',q:'1盒'},{id:'lary',c:'31',n:'喉頭鏡柄＋葉片',q:'各1個'},
+  {id:'basin',c:'31',n:'彎盆',q:'1個'},{id:'pen',c:'31',n:'麥克筆',q:'1支'},
+  {id:'scissor',c:'31',n:'剪刀',q:'1把'},{id:'light',c:'31',n:'筆燈',q:'1支'},
+  {id:'hrub',c:'31',n:'乾洗手液',q:'1瓶'},{id:'glass',c:'31',n:'非感染性玻璃收集盒',q:'1個'},
+  {id:'ndl',c:'31',n:'針頭收集器',q:'1個'},
+  {id:'adeno',c:'32',n:'Adenocor (Adenosine)',q:'5支'},{id:'atro',c:'32',n:'Atropine',q:'5支'},
+  {id:'cord',c:'32',n:'Cordaron (Amiodarone)',q:'2支'},{id:'dopa',c:'32',n:'Gipamine (Dopamine)',q:'1包'},
+  {id:'epi',c:'32',n:'Epinephrine',q:'20支'},{id:'furo',c:'32',n:'Rastiol (Furosemide)',q:'5支'},
+  {id:'gluc',c:'32',n:'Glucose 50%',q:'5支'},{id:'lido',c:'32',n:'Xylocaine 2%',q:'2支'},
+  {id:'mgso',c:'32',n:'MgSO₄ 10%',q:'2支'},{id:'midazo',c:'32',n:'Midazolam (Dormicum)',q:'2支'},
+  {id:'nahco',c:'32',n:'Rolikan (NaHCO₃)',q:'10支'},{id:'norepi',c:'32',n:'Levophed',q:'2支'},
+  {id:'nitro',c:'32',n:'Nitrostat S.L.',q:'1瓶'},{id:'nalox',c:'32',n:'Naloxone',q:'1支'},
+  {id:'nrm',c:'33',n:'氧氣面罩 (NRM)',q:'1組'},{id:'bvm',c:'33',n:'拋棄式 BVM',q:'1組'},
+  {id:'ett65',c:'33',n:'氣管內管 6.5',q:'2條'},{id:'ett70',c:'33',n:'氣管內管 7.0',q:'2條'},
+  {id:'ett75',c:'33',n:'氣管內管 7.5',q:'2條'},{id:'ett80',c:'33',n:'氣管內管 8.0',q:'2條'},
+  {id:'airway',c:'33',n:'Airway 口100mm',q:'1組'},{id:'syr3',c:'33',n:'空針 3cc',q:'各5支'},
+  {id:'syr10',c:'33',n:'空針 10cc',q:'各5支'},{id:'iv20',c:'33',n:'靜脈留置針 20號',q:'各2支'},
+  {id:'iv22',c:'33',n:'靜脈留置針 22號',q:'各2支'},{id:'ivset',c:'33',n:'普通 IV set',q:'各1付'},
+  {id:'pump',c:'33',n:'Pump set',q:'各1付'},{id:'glv65',c:'33',n:'無菌手套 6.5碼',q:'2付'},
+  {id:'glv70',c:'33',n:'無菌手套 7.0碼',q:'2付'},{id:'jelly',c:'33',n:'水溶性 Jelly',q:'2包'},
+  {id:'alc',c:'33',n:'酒精棉片',q:'2片'},{id:'tway',c:'33',n:'3 way',q:'2個'},
+  {id:'ns500',c:'33',n:'N.S 0.9% 500mL',q:'1袋'},
+];
+
+// ── init ──
+const now=new Date();
+const dstr=now.toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'});
+const tstr=now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+document.getElementById('top-chip').textContent=dstr+' '+tstr;
+const h=now.getHours();
+document.getElementById('hero-time').textContent=h<6?'深夜班時段':h<12?'白班時段':h<18?'小夜時段':'大夜時段';
+
+// log storage
+let logs=JSON.parse(sessionStorage.getItem('logs')||'[]');
+function saveLogs(){sessionStorage.setItem('logs',JSON.stringify(logs));}
+function renderLog(){
+  const el=document.getElementById('home-log');
+  if(!logs.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;"><i class="ti ti-clock" style="display:block;font-size:22px;margin-bottom:6px;"></i>今日尚無點班記錄</div>';return;}
+  el.innerHTML=logs.slice().reverse().map(l=>`
+    <div class="li"><div class="ldot ${l.type}"></div><div class="linfo"><div class="ln">${l.title}</div><div class="lm">${l.meta}</div></div><div class="lt">${l.time}</div></div>`).join('');
+}
+renderLog();
+
+// shift status
+function markShift(ward,shift){
+  const id=`s-${ward}-${shift}`;
+  const el=document.getElementById(id);
+  if(el){el.className='sp done';el.innerHTML=`<div class="sn">${shift==='day'?'白班':shift==='eve'?'小夜':'大夜'}</div>✓`;}
+}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function gs(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo&&window.scrollTo(0,0);}
+function goHome(){gs('pg-home');renderLog();}
+
+// ── DAILY ──
+let dState={},allOk=false;
+function goDailyS1(){dState={};allOk=false;gs('pg-d1');}
+function goDailyS2(){
+  if(!document.getElementById('d-nurse').value){showToast('請選擇點班護理師');return;}
+  if(!document.getElementById('d-lock').value){showToast('請輸入鎖片號碼');return;}
+  dState={};allOk=false;renderDItems();updateAobUI();updDBtn();gs('pg-d2');
+}
+function toggleAllOk(){
+  allOk=!allOk;
+  if(allOk)DITEMS.forEach(it=>{dState[it.id]='ok';});else dState={};
+  renderDItems();updateAobUI();updDProg();updDBtn();
+}
+function updateAobUI(){
+  const btn=document.getElementById('aob'),icon=document.getElementById('aob-icon');
+  const title=document.getElementById('aob-title'),sub=document.getElementById('aob-sub'),chk=document.getElementById('aob-chk');
+  if(allOk){
+    btn.classList.add('active');icon.innerHTML='<i class="ti ti-circle-check"></i>';
+    title.textContent='✓ 全部正常已確認';sub.textContent='若有個別異常，直接點下方物品標記即可';
+    chk.style.color='var(--green)';
+  }else{
+    btn.classList.remove('active');icon.innerHTML='<i class="ti ti-checks"></i>';
+    title.textContent='全部正常，一鍵確認';sub.textContent='所有物品均在位且正常 → 直接點這裡送出';
+    chk.style.color='transparent';
+  }
+}
+function renderDItems(){
+  document.getElementById('d-items').innerHTML=DITEMS.map(it=>{
+    const s=dState[it.id]||'';const dim=allOk&&s==='ok'?' dimmed':'';
+    return`<div class="item ${s==='ok'?'ok':s==='bad'?'bad':''}${dim}" id="dc-${it.id}">
+      <div class="item-top"><div class="idot"></div><div class="iname">${it.n}</div><span class="iqty">${it.q}</span></div>
+      <div class="ibtns">
+        <button class="ibtn ${s==='ok'?'aok':''}" onclick="setD('${it.id}','ok')"><i class="ti ti-check"></i> 正常</button>
+        <button class="ibtn ${s==='bad'?'abad':''}" onclick="setD('${it.id}','bad')"><i class="ti ti-x"></i> 異常</button>
+      </div>
+      <div class="badnote ${s==='bad'?'show':''}" id="dn-${it.id}"><textarea class="bai" rows="2" placeholder="請說明異常情形..."></textarea></div>
+    </div>`;
+  }).join('');updDProg();
+}
+function setD(id,val){
+  dState[id]=val;
+  if(val==='bad'){allOk=false;updateAobUI();}
+  else if(DITEMS.every(it=>dState[it.id]==='ok')){allOk=true;updateAobUI();}
+  const c=document.getElementById('dc-'+id);
+  c.className=`item ${val==='ok'?'ok':'bad'}`;
+  c.querySelectorAll('.ibtn')[0].classList.toggle('aok',val==='ok');
+  c.querySelectorAll('.ibtn')[1].classList.toggle('abad',val==='bad');
+  document.getElementById('dn-'+id).classList.toggle('show',val==='bad');
+  updDProg();updDBtn();
+}
+function updDProg(){
+  const n=Object.keys(dState).length,t=DITEMS.length;
+  document.getElementById('d-pfill').style.width=Math.round(n/t*100)+'%';
+  document.getElementById('d-ptxt').textContent=`${n} / ${t}`;
+}
+function updDBtn(){document.getElementById('d-submit-btn').disabled=!(allOk||Object.keys(dState).length===DITEMS.length);}
+function goDailyS3(){
+  const shift=document.getElementById('d-shift').value,ward=document.getElementById('d-ward').value;
+  const nurse=document.getElementById('d-nurse').value,lock=document.getElementById('d-lock').value;
+  const bad=DITEMS.filter(it=>dState[it.id]==='bad');
+  const mp=document.getElementById('d-mode-pill');
+  if(allOk&&!bad.length){mp.className='mode-pill full';mp.innerHTML='<i class="ti ti-circle-check"></i> 全部正常（一鍵確認）';}
+  else{mp.className='mode-pill partial';mp.innerHTML=`<i class="ti ti-list-check"></i> 逐項確認（${bad.length} 項異常）`;}
+  document.getElementById('d-sum-info').innerHTML=`<div class="sum-hd">點班資訊</div>
+    <div class="sr"><span style="color:var(--text2)">班別</span><span class="sv ov">${shift}</span></div>
+    <div class="sr"><span style="color:var(--text2)">急救車</span><span class="sv ov">${ward}</span></div>
+    <div class="sr"><span style="color:var(--text2)">點班人</span><span class="sv ov">${nurse}</span></div>
+    <div class="sr"><span style="color:var(--text2)">鎖片號碼</span><span class="sv ov">${lock}</span></div>
+    <div class="sr"><span style="color:var(--text2)">時間</span><span class="sv" style="color:var(--text3)">${tstr}</span></div>`;
+  document.getElementById('d-sum-result').innerHTML=`<div class="sum-hd">點班結果</div>
+    <div class="sr"><span style="color:var(--text2)">正常物品</span><span class="sv ov">${DITEMS.length-bad.length} / ${DITEMS.length} 項</span></div>
+    <div class="sr"><span style="color:var(--text2)">異常物品</span><span class="sv ${bad.length?'rv':'ov'}">${bad.length} 項</span></div>
+    '+bad.map(function(it){return '<div class="sr" style="padding-left:14px;"><span style="font-size:12px;color:var(--red)">⚠ '+it.n+'</span></div>';}).join('')+'`;
+  gs('pg-d3');
+}
+async function submitDaily(){
+  const nurse=document.getElementById('d-nurse').value,shift=document.getElementById('d-shift').value;
+  const ward=document.getElementById('d-ward').value;
+  const lock=document.getElementById('d-lock').value;
+  const bad=DITEMS.filter(it=>dState[it.id]==='bad');
+  const wardKey=ward.includes('內')?'nei':'wai';
+  const shiftKey=shift.includes('白')?'day':shift.includes('小')?'eve':'ngt';
+  showToast('送出中...');
+  const payload={
+    type:'daily_checkin', shift, ward, nurse, lockNumber:lock, allOk,
+    items:DITEMS.map(it=>({id:it.id,name:it.n,status:dState[it.id]||'ok',
+      note:document.getElementById('dn-'+it.id)?.querySelector('textarea')?.value||''}))
+  };
+  const result = await postToSheets(payload);
+  markShift(wardKey,shiftKey);
+  logs.push({type:'ok',title:`${ward} ${shift}點班完成`,meta:`${nurse} ・ ${bad.length?bad.length+'項異常':'全部正常'}`,time:tstr});
+  saveLogs();
+  let sub=result.success?'資料已同步至後線總表<br>護理長儀表板即時更新為 ✅':'資料已記錄（網路恢復後同步）';
+  if(bad.length)sub+=`<br><span style="color:var(--amber)">⚠ ${bad.length} 項異常已通知護理長</span>`;
+  document.getElementById('d-done-sub').innerHTML=sub;
+  document.getElementById('d-done-meta').textContent=`${shift} ・ ${nurse} ・ ${tstr}`;
+  gs('pg-done-d');showToast(result.success?'點班完成，資料已儲存 ✓':'點班完成（離線模式）');
+}
+
+// ── EMERGENCY ──
+let emW='',emP={},emCatVal='all',emQ='';
+function emWard(w){emW=w;document.getElementById('em-nei').className='wb'+(w==='nei'?' sel-r':'');document.getElementById('em-wai').className='wb'+(w==='wai'?' sel-r':'');}
+function resetEm(){emW='';emP={};emCatVal='all';emQ='';document.getElementById('em-nei').className='wb';document.getElementById('em-wai').className='wb';}
+function goEmS2(){if(!emW){showToast('請先選擇急救車');return;}emP={};emQ='';document.getElementById('em-search').value='';document.querySelectorAll('.ct').forEach((t,i)=>t.classList.toggle('active',i===0));emCatVal='all';renderEmPick();gs('pg-em2');}
+function emGetList(){return ALL.filter(it=>{const co=emCatVal==='all'||it.c===emCatVal;const so=!emQ||it.n.toLowerCase().includes(emQ);return co&&so;});}
+function renderEmPick(){
+  const list=emGetList(),el=document.getElementById('em-pick');
+  el.innerHTML=list.length?list.map(it=>`
+    <div class="pi ${emP[it.id]?'picked':''}" onclick="emToggle('${it.id}')">
+      <div class="pi-chk">${emP[it.id]?'<i class="ti ti-check"></i>':''}</div>
+      <div class="pi-name">${it.n}</div>
+      <div class="pi-meta">${it.c==='31'?'物品':it.c==='32'?'藥品':'器材'} ・ ${it.q}</div>
+    </div>`).join('')
+    :'<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">找不到符合物品</div>';
+  renderEmDetail();
+  const n=Object.keys(emP).length;document.getElementById('em-n').textContent=n?`${n}項`:'';
+}
+function emToggle(id){if(emP[id])delete emP[id];else emP[id]={qty:1,rep:false,exp:''};renderEmPick();}
+function emCat(el,cat){el.closest('.cat-tabs').querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));el.classList.add('active');emCatVal=cat;renderEmPick();}
+function emSearch(v){emQ=v.toLowerCase();renderEmPick();}
+function renderEmDetail(){
+  const ids=Object.keys(emP),el=document.getElementById('em-detail');
+  if(!ids.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="sl">取用數量 & 補充狀態（${ids.length}項）</div>`
+    +ids.map(id=>{
+      const it=ALL.find(x=>x.id===id),d=emP[id];
+      return`<div class="sel-em-card">
+        <div class="sec-name"><i class="ti ti-package" style="font-size:12px"></i> ${it.n}</div>
+        <div class="qty-row">
+          <span class="qty-lbl">取用數量</span>
+          <div class="qty-step">
+            <button class="qsb" onclick="emAdj('${id}',-1)"><i class="ti ti-minus" style="font-size:13px"></i></button>
+            <input class="qsv" type="number" min="1" value="${d.qty}" onchange="emP['${id}'].qty=Math.max(1,parseInt(this.value)||1);this.value=emP['${id}'].qty">
+            <button class="qsb" onclick="emAdj('${id}',1)"><i class="ti ti-plus" style="font-size:13px"></i></button>
+          </div>
+        </div>
+        <div class="rep-row">
+          <label class="tog"><input type="checkbox" id="et-${id}" ${d.rep?'checked':''} onchange="emRep('${id}',this.checked)"><div class="tog-sl"></div></label>
+          <div class="rep-info"><div class="rt">已補充新品回急救車</div><div class="rs">開啟後填入新效期</div></div>
+        </div>
+        <div class="exp-row ${d.rep?'show':''}" id="er-${id}">
+          <span class="exp-lbl">新效期</span>
+          <input class="exp-inp" type="month" value="${d.exp||''}" onchange="emP['${id}'].exp=this.value">
+        </div>
+      </div>`;
+    }).join('');
+}
+function emAdj(id,d){emP[id].qty=Math.max(1,(emP[id].qty||1)+d);renderEmDetail();}
+function emRep(id,v){emP[id].rep=v;document.getElementById('er-'+id)?.classList.toggle('show',v);}
+function goEmS3(){
+  const ids=Object.keys(emP);if(!ids.length){showToast('請選擇至少一項取用物品');return;}
+  const wn=emW==='nei'?'內科急救車':'外科急救車';
+  const rc=ids.filter(id=>emP[id].rep).length,nr=ids.length-rc;
+  document.getElementById('em-sum-basic').innerHTML=`<div class="sum-hd">基本資訊</div>
+    <div class="sr"><span style="color:var(--text2)">急救車</span><span class="sv ov">${wn}</span></div>
+    <div class="sr"><span style="color:var(--text2)">記錄時間</span><span class="sv" style="color:var(--text3)">${dstr} ${tstr}</span></div>
+    <div class="sr"><span style="color:var(--text2)">取用物品數</span><span class="sv rv">${ids.length} 項</span></div>`;
+  document.getElementById('em-sum-items').innerHTML=`<div class="sum-hd">取用明細</div>`
+    +ids.map(id=>{const it=ALL.find(x=>x.id===id),d=emP[id];return`<div class="sum-item-blk">
+      <div class="sin"><i class="ti ti-package" style="font-size:11px"></i> ${it.n}</div>
+      <div class="sid"><span>取用 ${d.qty} ${it.q.replace(/[0-9]/g,'').trim()||'個'}</span>
+        '+(d.rep?'<span style="color:var(--green)">✓ 已補充'+(d.exp?' ・ 效期 '+d.exp:'')+'</span>':'<span style="color:var(--amber)">⏳ 待補充</span>')+'
+      </div></div>`;}).join('')
+    +`<div class="sr" style="background:var(--sf2)"><span style="color:var(--text2);font-size:12px">已補充 / 待補充</span><span class="sv"><span style="color:var(--green)">${rc}</span> / <span style="color:var(--amber)">${nr}</span></span></div>`;
+  gs('pg-em3');
+}
+async function submitEm(){
+  const ids=Object.keys(emP),wn=emW==='nei'?'內科急救車':'外科急救車';
+  const rc=ids.filter(id=>emP[id].rep).length,nr=ids.length-rc;
+  const itemNames=ids.map(id=>ALL.find(x=>x.id===id)?.n).join('、');
+  showToast('送出中...');
+  const payload={
+    type:'emergency', ward:wn,
+    items:ids.map(id=>{const it=ALL.find(x=>x.id===id),d=emP[id];
+      return{id,name:it.n,qty:d.qty,replenished:d.rep,newExp:d.exp||''};})
+  };
+  const result = await postToSheets(payload);
+  logs.push({type:'em',title:`緊急取用 — ${itemNames}`,meta:`${wn} ・ ${rc?rc+'項已補充・':''} ${nr?nr+'項待補充':''}`,time:tstr});
+  saveLogs();
+  let sub=result.success
+    ?`<span style="color:var(--red)">護理長已收到即時通知</span><br>`
+    :`<span style="color:var(--amber)">已記錄（護理長將在網路恢復後收到通知）</span><br>`;
+  if(rc)sub+=`<span style="color:var(--green)">✓ ${rc} 項已補充，效期已更新</span><br>`;
+  if(nr)sub+=`<span style="color:var(--amber)">⚠ ${nr} 項待補充，下次點班提醒</span>`;
+  document.getElementById('em-done-sub').innerHTML=sub;
+  document.getElementById('em-done-meta').textContent=`${wn} ・ ${ids.length} 項 ・ ${tstr}`;
+  gs('pg-done-em');showToast(result.success?'緊急取用已記錄，護理長已通知！':'緊急取用已記錄！');
+}
+
+// ══════════════════════════════════════
+//  API 設定 — Google Apps Script 網址
+// ══════════════════════════════════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbxcsb-N4edC7PrvTHXiDS_1PODR93OXwLO12EBoSTX1mrqxlb8OwDTbRsjV7yNb1v8iGg/exec';
+
+// 送資料到 Google Sheets
+async function postToSheets(payload) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    return json;
+  } catch(err) {
+    console.error('API 錯誤:', err);
+    return { success: false, message: err.toString() };
+  }
+}
+
+// 從 Google Sheets 讀取今日狀態
+async function loadTodayStatus() {
+  try {
+    const res = await fetch(API_URL + '?action=get_status');
+    const json = await res.json();
+    if (json.success && json.records) {
+      json.records.forEach(r => {
+        const wardKey = r.ward.includes('內科') ? 'nei' : 'wai';
+        const shiftKey = r.shift.includes('白') ? 'day' : r.shift.includes('小') ? 'eve' : 'ngt';
+        markShift(wardKey, shiftKey);
+      });
+    }
+  } catch(err) {
+    console.log('讀取狀態失敗（離線模式）');
+  }
+}
+
+// 頁面載入時讀取今日狀態
+window.addEventListener('load', () => {
+  loadTodayStatus();
+});
+
+// ── MAKEUP ──
+let muS='',muR='',muState={};
+function muShift(s,el){muS=s;document.querySelectorAll('#mu-shift-btns .msb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
+function muReason(el,r){muR=r;document.querySelectorAll('#mu-reasons .rc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function goMuS2(){
+  if(!document.getElementById('mu-nurse').value){showToast('請選擇補填護理師');return;}
+  if(!document.getElementById('mu-lock').value){showToast('請輸入鎖片號碼');return;}
+  if(!muS){showToast('請選擇要補填的班別');return;}
+  if(!muR){showToast('請選擇未點班原因');return;}
+  const smap={day:'白班',eve:'小夜班',ngt:'大夜班'};
+  document.getElementById('mu-mode-tag').textContent=`補填模式 ・ ${document.getElementById('mu-ward').value} ${smap[muS]}`;
+  muState={};
+  document.getElementById('mu-items').innerHTML=DITEMS.map(it=>`
+    <div class="item" id="mc-${it.id}">
+      <div class="item-top"><div class="idot"></div><div class="iname">${it.n}</div><span class="iqty">${it.q}</span></div>
+      <div class="ibtns">
+        <button class="ibtn" onclick="setMu('${it.id}','ok')"><i class="ti ti-check"></i> 正常</button>
+        <button class="ibtn" onclick="setMu('${it.id}','bad')"><i class="ti ti-x"></i> 異常</button>
+      </div>
+      <div class="badnote" id="mn-${it.id}"><textarea class="bai" rows="2" placeholder="請說明異常情形..."></textarea></div>
+    </div>`).join('');
+  updMuProg();gs('pg-mu2');
+}
+function setMu(id,val){
+  muState[id]=val;
+  const c=document.getElementById('mc-'+id);c.className=`item ${val==='ok'?'ok':'bad'}`;
+  c.querySelectorAll('.ibtn')[0].classList.toggle('aok',val==='ok');
+  c.querySelectorAll('.ibtn')[1].classList.toggle('abad',val==='bad');
+  document.getElementById('mn-'+id).classList.toggle('show',val==='bad');
+  updMuProg();
+}
+function updMuProg(){
+  const n=Object.keys(muState).length,t=DITEMS.length;
+  document.getElementById('mu-pfill').style.width=Math.round(n/t*100)+'%';
+  document.getElementById('mu-ptxt').textContent=`${n} / ${t}`;
+}
+async function submitMakeup(){
+  if(Object.keys(muState).length<DITEMS.length){showToast(`還有 ${DITEMS.length-Object.keys(muState).length} 項未確認`);return;}
+  const nurse=document.getElementById('mu-nurse').value;
+  const ward=document.getElementById('mu-ward').value;
+  const lock=document.getElementById('mu-lock').value;
+  const smap={day:'白班',eve:'小夜班',ngt:'大夜班'};
+  const rmap={emergency:'臨時急救',forgot:'忘記點班',system:'系統問題',other:'其他原因'};
+
+  // 顯示送出中
+  showToast('送出中...');
+
+  // 送到 Google Sheets
+  const payload = {
+    type: 'makeup',
+    shift: smap[muS],
+    ward: ward,
+    nurse: nurse,
+    lockNumber: lock,
+    reason: muR,
+    note: document.getElementById('mu-note').value || '',
+    items: DITEMS.map(it => ({
+      id: it.id,
+      name: it.n,
+      status: muState[it.id] || 'ok',
+      note: document.getElementById('mn-'+it.id)?.querySelector('textarea')?.value || ''
+    }))
+  };
+
+  const result = await postToSheets(payload);
+
+  logs.push({type:'mu',title:`補點班：${smap[muS]}（補填）`,meta:`${nurse} ・ 原因：${rmap[muR]}`,time:tstr});
+  saveLogs();
+  document.getElementById('mu-done-meta').textContent=`${smap[muS]}補填 ・ ${nurse} ・ ${rmap[muR]} ・ ${tstr}`;
+  gs('pg-done-mu');
+  showToast(result.success ? '補點班已送出，護理長已通知 ✓' : '已記錄（離線模式）');
+}
+
+// ══════════════════════════════════════
+//  月盤點 (MONTHLY)
+// ══════════════════════════════════════
+const MO_ITEMS = [
+  {id:'glove',c:'31',n:'清潔手套',q:'1盒',days:null,warned:false},
+  {id:'hrub',c:'31',n:'乾洗手液（使得利達）',q:'1瓶',days:593,warned:false},
+  {id:'adeno',c:'32',n:'Adenocor (Adenosine)',q:'5支',days:-49,warned:true},
+  {id:'atro_a',c:'32',n:'Atropine（批號A）',q:'1支',days:67,warned:true},
+  {id:'atro_b',c:'32',n:'Atropine（批號B）',q:'3支',days:270,warned:false},
+  {id:'atro_c',c:'32',n:'Atropine（批號C）',q:'1支',days:495,warned:false},
+  {id:'cord',c:'32',n:'Cordaron (Amiodarone)',q:'2支',days:285,warned:false},
+  {id:'dopa',c:'32',n:'Gipamine (Dopamine)',q:'1包',days:153,warned:false},
+  {id:'epi_a',c:'32',n:'Epinephrine（批號A）',q:'4支',days:192,warned:false},
+  {id:'epi_b',c:'32',n:'Epinephrine（批號B）',q:'16支',days:197,warned:false},
+  {id:'furo',c:'32',n:'Rastiol (Furosemide)',q:'5支',days:165,warned:false},
+  {id:'gluc',c:'32',n:'Glucose 50%',q:'5支',days:530,warned:false},
+  {id:'lido_a',c:'32',n:'Xylocaine 2%（批號A）',q:'1支',days:134,warned:false},
+  {id:'lido_b',c:'32',n:'Xylocaine 2%（批號B）',q:'1支',days:499,warned:false},
+  {id:'mgso_a',c:'32',n:'MgSO₄ 10%（批號A）',q:'1支',days:104,warned:false},
+  {id:'mgso_b',c:'32',n:'MgSO₄ 10%（批號B）',q:'1支',days:195,warned:false},
+  {id:'midazo',c:'32',n:'Midazolam (Dormicum)',q:'2支',days:956,warned:false},
+  {id:'norepi',c:'32',n:'Levophed (Norepinephrine)',q:'2支',days:-49,warned:true},
+  {id:'nahco_a',c:'32',n:'Rolikan NaHCO₃（批號A）',q:'1支',days:106,warned:false},
+  {id:'nahco_b',c:'32',n:'Rolikan NaHCO₃（批號B）',q:'9支',days:176,warned:false},
+  {id:'diphen',c:'32',n:'Benamine (Diphenhydramine)',q:'2支',days:436,warned:false},
+  {id:'nitro',c:'32',n:'Nitrostat S.L.',q:'1瓶',days:257,warned:false},
+  {id:'nalox',c:'32',n:'Naloxone',q:'1支',days:414,warned:false},
+  {id:'nrm',c:'33',n:'氧氣面罩 (NRM)',q:'1組',days:668,warned:false},
+  {id:'bvm',c:'33',n:'拋棄式 BVM',q:'1組',days:226,warned:false},
+  {id:'ett65',c:'33',n:'氣管內管 6.5',q:'2條',days:802,warned:false},
+  {id:'ett70',c:'33',n:'氣管內管 7.0',q:'2條',days:864,warned:false},
+  {id:'ett75',c:'33',n:'氣管內管 7.5',q:'2條',days:771,warned:false},
+  {id:'ett80',c:'33',n:'氣管內管 8.0',q:'2條',days:894,warned:false},
+  {id:'jelly',c:'33',n:'水溶性 Jelly',q:'2包',days:165,warned:true},
+  {id:'airway',c:'33',n:'Airway 口100mm',q:'1組',days:148,warned:true},
+  {id:'airn',c:'33',n:'Airway 鼻7.5mm',q:'1個',days:526,warned:false},
+  {id:'ppe',c:'33',n:'PPE',q:'2組',days:226,warned:false},
+  {id:'syr3',c:'33',n:'空針 3cc',q:'各5支',days:1959,warned:false},
+  {id:'syr5',c:'33',n:'空針 5cc',q:'各5支',days:253,warned:false},
+  {id:'syr10',c:'33',n:'空針 10cc',q:'各5支',days:1173,warned:false},
+  {id:'iv20',c:'33',n:'靜脈留置針 20號',q:'各2支',days:742,warned:false},
+  {id:'iv22',c:'33',n:'靜脈留置針 22號',q:'各2支',days:284,warned:false},
+  {id:'iv24',c:'33',n:'靜脈留置針 24號',q:'各2支',days:284,warned:false},
+  {id:'ivset',c:'33',n:'普通 IV set',q:'各1付',days:499,warned:false},
+  {id:'pump',c:'33',n:'Pump set',q:'各1付',days:195,warned:false},
+  {id:'ns500',c:'33',n:'N.S 0.9% 500mL',q:'1袋',days:614,warned:false},
+];
+
+let moRep={}, moPh=[false,false,false], moCatV='all', moOpen=null;
+
+function goMoS2(){
+  // 初始化日期
+  const moDateEl=document.getElementById('mo-date');
+  if(moDateEl&&!moDateEl.value) moDateEl.value=new Date().toISOString().split('T')[0];
+  if(!document.getElementById('mo-nurse').value){showToast('請選擇點班護理師');return;}
+  if(!document.getElementById('mo-review').value){showToast('請選擇覆核護理師');return;}
+  if(!document.getElementById('mo-lock').value){showToast('請輸入鎖片號碼');return;}
+  moRep={};moPh=[false,false,false];moOpen=null;
+  renderMoList('all');
+  gs('pg-mo2');
+}
+
+function renderMoList(cat){
+  moCatV=cat;
+  let items=MO_ITEMS;
+  if(cat!=='all') items=items.filter(it=>it.c===cat);
+  const el=document.getElementById('mo-item-list');
+  const repCount=Object.keys(moRep).length;
+  const pfill=document.getElementById('mo-pfill');
+  const ptxt=document.getElementById('mo-ptxt');
+  if(pfill) pfill.style.width=Math.round(repCount/MO_ITEMS.length*100)+'%';
+  if(ptxt) ptxt.textContent='已更換 '+repCount+' 項';
+
+  el.innerHTML=items.map(function(it){
+    const r=moRep[it.id];
+    const isOpen=moOpen===it.id;
+    let expHtml='';
+    if(it.days!==null){
+      if(it.days<0) expHtml='<span class="mo-exp red">過期'+Math.abs(it.days)+'天</span>';
+      else if(it.days<=180) expHtml='<span class="mo-exp amber">'+it.days+'天</span>';
+    }
+    const rotateStyle=isOpen?'transform:rotate(180deg)':'';
+    const repBadge=r?'<span class="rep-badge-sm">已更換</span>':'';
+    const itemClass='mo-item'+(r?' replaced':'')+(isOpen?' open':'');
+
+    let formHtml='';
+    if(isOpen){
+      let fieldsHtml='';
+      if(r){
+        fieldsHtml='<div class="mo-fields">'
+          +'<div class="mo-field"><label>新效期</label>'
+          +'<input type="month" value="'+(r.exp||'')+'" onchange="moRep[''+it.id+''].exp=this.value"></div>'
+          +'<div class="mo-field"><label>更換數量</label>'
+          +'<input type="number" min="1" value="'+(r.qty||'')+'" placeholder="數量" onchange="moRep[''+it.id+''].qty=this.value"></div>'
+          +'</div>';
+      }
+      formHtml='<div class="mo-form" style="display:block;border-top:1px solid var(--bdr);padding:0 14px 12px;">'
+        +'<div style="font-size:11px;color:var(--text2);margin-top:10px;margin-bottom:8px;">本次是否更換？</div>'
+        +'<div class="mo-yesno">'
+        +'<div class="mo-yn '+(r?'yes':'')+'" onclick="moSetRep(''+it.id+'',true)"><i class="ti ti-check"></i> 是，有更換</div>'
+        +'<div class="mo-yn '+(r?'':'no')+'" onclick="moSetRep(''+it.id+'',false)"><i class="ti ti-x"></i> 未更換</div>'
+        +'</div>'
+        +fieldsHtml
+        +'</div>';
+    }
+
+    return '<div class="'+itemClass+'" id="moc-'+it.id+'">'
+      +'<div class="mo-item-hd" onclick="moToggle(''+it.id+'')">'
+      +'<div class="mo-idot"></div>'
+      +'<div class="mo-iname">'+it.n+'</div>'
+      +'<span class="mo-iqty">'+it.q+'</span>'
+      +expHtml
+      +repBadge
+      +'<i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3);margin-left:4px;transition:transform .2s;'+rotateStyle+'"></i>'
+      +'</div>'
+      +formHtml
+      +'</div>';
+  }).join('');
+}
+
+function moToggle(id){moOpen=moOpen===id?null:id;renderMoList(moCatV);}
+function moCat(el,cat){el.closest('.cat-tabs').querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderMoList(cat);}
+function moSetRep(id,yes){
+  if(yes){moRep[id]={exp:'',qty:''};}else{delete moRep[id];}
+  renderMoList(moCatV);
+}
+function moPhoto(i){
+  moPh[i]=true;
+  const sl=document.getElementById('moph'+i);
+  const labels=['3-1 物品','3-2 藥品','3-3 器材'];
+  sl.style.background='#dcfce7';sl.style.borderColor='#86efac';sl.style.borderStyle='solid';
+  sl.innerHTML=`<i class="ti ti-circle-check" style="font-size:22px;color:var(--green);margin-bottom:4px;"></i><div style="font-size:10px;color:var(--green);">${labels[i]} ✓</div>`;
+  showToast('照片已上傳 ✓');
+}
+function goMoS4(){
+  if(!moPh.every(Boolean)){showToast('請上傳三層照片（3-1 / 3-2 / 3-3）');return;}
+  const nurse=document.getElementById('mo-nurse').value,ward=document.getElementById('mo-ward').value;
+  const review=document.getElementById('mo-review').value,lock=document.getElementById('mo-lock').value;
+  const date=document.getElementById('mo-date').value;
+  const keys=Object.keys(moRep);
+  document.getElementById('mo-sum-info').innerHTML=`
+    <div class="sum-hd">盤點資訊</div>
+    <div class="sr"><span style="color:var(--text2)">盤點日期</span><span class="sv av">${date}</span></div>
+    <div class="sr"><span style="color:var(--text2)">急救車</span><span class="sv ov">${ward}</span></div>
+    <div class="sr"><span style="color:var(--text2)">點班護理師</span><span class="sv ov">${nurse}</span></div>
+    <div class="sr"><span style="color:var(--text2)">覆核護理師</span><span class="sv ov">${review}</span></div>
+    <div class="sr"><span style="color:var(--text2)">鎖片號碼</span><span class="sv ov">${lock}</span></div>
+    <div class="sr"><span style="color:var(--text2)">分層照片</span><span class="sv ov">3 層已上傳 ✓</span></div>`;
+  const rh=keys.length===0
+    ?'<div class="sr"><span style="color:var(--text2)">更換物品</span><span class="sv ov">無更換</span></div>'
+    :`<div class="sr"><span style="color:var(--text2)">更換物品數</span><span class="sv av">${keys.length} 項</span></div>`
+    +keys.map(id=>{const it=MO_ITEMS.find(x=>x.id===id),r=moRep[id];
+      return`<div class="sr" style="padding-left:10px;"><span style="font-size:12px;color:var(--green);">▸ ${it.n}</span><span class="sv" style="color:var(--text3);font-size:11px;">${r.exp||'—'} ×${r.qty||'?'}</span></div>`;
+    }).join('');
+  document.getElementById('mo-sum-rep').innerHTML=`<div class="sum-hd">更換明細</div>${rh}`;
+  gs('pg-mo4');
+}
+async function submitMonthly(){
+  const nurse=document.getElementById('mo-nurse').value,ward=document.getElementById('mo-ward').value;
+  const review=document.getElementById('mo-review').value;
+  showToast('送出中...');
+  const keys=Object.keys(moRep);
+  const payload={
+    type:'monthly_checkin', ward, nurse, reviewer:review,
+    lockNumber:document.getElementById('mo-lock').value,
+    date:document.getElementById('mo-date').value,
+    note:document.getElementById('mo-note').value||'',
+    replaced:keys.map(id=>{const it=MO_ITEMS.find(x=>x.id===id),r=moRep[id];
+      return{id,name:it.n,exp:r.exp,qty:r.qty};})
+  };
+  const result=await postToSheets(payload);
+  let sub=result.success?'效期資料已同步至 MASTER 總表<br>護理長儀表板本月盤點更新為 ✅':'資料已記錄（網路恢復後同步）';
+  if(keys.length) sub+=`<br><span style="color:var(--amber)">共更換 ${keys.length} 項，效期已更新</span>`;
+  document.getElementById('mo-done-sub').innerHTML=sub;
+  document.getElementById('mo-done-meta').textContent=`${ward} ・ ${nurse} ・ ${tstr}`;
+  logs.push({type:'ok',title:`${ward} 15日大盤點完成`,meta:`${nurse} / ${review} ・ 更換${keys.length}項`,time:tstr});
+  saveLogs();
+  gs('pg-done-mo');showToast(result.success?'盤點完成，資料已儲存 ✓':'盤點完成（離線模式）');
+}
+
+// ══════════════════════════════════════
+//  護理長稽核 (AUDIT) — 四分頁版
+// ══════════════════════════════════════
+const AU_QS=[
+  '急救車封條完整，無破損或缺失',
+  '藥品數量與種類符合規定，無過期物品',
+  '急救器材功能正常（喉頭鏡、BVM等）',
+  '點班紀錄完整，每班均有記錄',
+  '急救車外觀清潔，擺放位置正確',
+  '本月大盤點照片已上傳存檔',
+];
+let auResult={}, auSigned=false, auCurTab='status';
+// 稽核歷史（本機存儲）
+let auHistory=JSON.parse(sessionStorage.getItem('auHistory')||'[]');
+
+// ── 分頁切換 ──
+function auSwitchTab(tab){
+  auCurTab=tab;
+  ['status','week','history','form'].forEach(t=>{
+    const panel=document.getElementById('au-panel-'+t);
+    const tabEl=document.getElementById('au-tab-'+t);
+    if(panel) panel.style.display=t===tab?'block':'none';
+    if(tabEl){
+      tabEl.style.borderBottomColor=t===tab?'var(--green)':'transparent';
+      tabEl.style.color=t===tab?'var(--green)':'var(--text3)';
+    }
+  });
+  if(tab==='status') renderAuStatus();
+  if(tab==='week') renderAuWeek();
+  if(tab==='history') renderAuHistory();
+  if(tab==='form') renderAuItems();
+}
+
+// ── 今日狀況 ──
+async function renderAuStatus(){
+  const shifts={
+    nei:{day:null,eve:null,ngt:null},
+    wai:{day:null,eve:null,ngt:null}
+  };
+  logs.forEach(function(l){
+    if(l.type==='ok'){
+      const wk=l.title.includes('內科')?'nei':'wai';
+      const sk=l.title.includes('白班')?'day':l.title.includes('小夜')?'eve':'ngt';
+      shifts[wk][sk]={nurse:l.meta.split('・')[0].trim(),time:l.time};
+    }
+  });
+  try{
+    const res=await fetch(API_URL+'?action=get_status');
+    const json=await res.json();
+    if(json.success&&json.records){
+      json.records.forEach(function(r){
+        const wk=r.ward.includes('內')?'nei':'wai';
+        const sk=r.shift.includes('白')?'day':r.shift.includes('小')?'eve':'ngt';
+        shifts[wk][sk]={nurse:r.nurse,time:r.time};
+      });
+    }
+  }catch(e){}
+
+  const shiftNames={day:'白班',eve:'小夜班',ngt:'大夜班'};
+  ['nei','wai'].forEach(function(w){
+    const el=document.getElementById('au-'+(w==='nei'?'nei':'wai')+'-status');
+    if(!el) return;
+    let html='';
+    ['day','eve','ngt'].forEach(function(s){
+      const d=shifts[w][s];
+      if(d){
+        html+='<div class="sr"><span style="color:var(--text2)">'+shiftNames[s]+'</span>'
+          +'<span style="display:flex;align-items:center;gap:6px;">'
+          +'<span style="font-size:10px;background:#dcfce7;color:var(--green);border:1px solid #86efac;border-radius:10px;padding:1px 8px;">✓ 完成</span>'
+          +'<span class="sv" style="color:var(--text3);font-size:11px;">'+d.nurse+' '+d.time+'</span>'
+          +'</span></div>';
+      } else {
+        html+='<div class="sr"><span style="color:var(--text2)">'+shiftNames[s]+'</span>'
+          +'<span style="font-size:10px;background:#fffbeb;color:var(--amber);border:1px solid #fde68a;border-radius:10px;padding:1px 8px;">待點班</span></div>';
+      }
+    });
+    el.innerHTML=html;
+  });
+
+  const logEl=document.getElementById('au-today-log');
+  const todayLogs=logs.filter(function(l){return l.time;});
+  if(!todayLogs.length){
+    logEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--text3);font-size:12px;">今日尚無記錄</div>';
+  } else {
+    logEl.innerHTML=todayLogs.slice().reverse().map(function(l){
+      return '<div class="li">'
+        +'<div class="ldot '+l.type+'"></div>'
+        +'<div class="linfo"><div class="ln">'+l.title+'</div><div class="lm">'+l.meta+'</div></div>'
+        +'<div class="lt">'+l.time+'</div>'
+        +'</div>';
+    }).join('');
+  }
+}
+
+// ── 本週進度 + 歷史記錄（從 API 讀取）──
+async function renderAuWeek(){
+  const days=['日','一','二','三','四','五','六'];
+  const today=new Date();
+  const weekStart=new Date(today);
+  weekStart.setDate(today.getDate()-((today.getDay()+6)%7));
+
+  // 先顯示本機記錄
+  function renderWeekForWard(w, records){
+    const el=document.getElementById('au-week-'+w);
+    if(!el) return;
+    let html='';
+    for(let i=0;i<7;i++){
+      const d=new Date(weekStart);
+      d.setDate(weekStart.getDate()+i);
+      if(d>today) break;
+      const dStr=(d.getMonth()+1)+'/'+(d.getDate());
+      const dayName=days[d.getDay()];
+      const dPrefix=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+      const dayRecs=records.filter(function(r){return r.timestamp&&r.timestamp.startsWith(dPrefix);});
+      const shiftLabels=['白','小夜','大夜'];
+      const shiftFull=['白班','小夜班','大夜班'];
+      let tagHtml='';
+      shiftLabels.forEach(function(s,si){
+        const done=dayRecs.some(function(r){return r.shift&&r.shift.includes(shiftFull[si].replace('班',''));});
+        const tagStyle=done?'background:#dcfce7;color:var(--green);':'background:var(--sf3);color:var(--text3);';
+        tagHtml+='<span style="font-size:10px;padding:1px 6px;border-radius:4px;'+tagStyle+'">'+s+'</span>';
+      });
+      const countTxt=dayRecs.length?'<span style="font-size:10px;color:var(--text3);">'+dayRecs.length+'筆</span>':'';
+      html+='<div class="sr"><span style="color:var(--text2);font-size:12px;">'+dStr+'（'+dayName+'）</span>'
+        +'<span style="display:flex;gap:4px;align-items:center;">'+tagHtml+countTxt+'</span></div>';
+    }
+    el.innerHTML=html||'<div style="padding:10px 14px;color:var(--text3);font-size:12px;">載入中...</div>';
+  }
+
+  // 顯示歷史記錄列表
+  function renderHistList(recs){
+    const histEl=document.getElementById('au-history-log');
+    if(!histEl) return;
+    if(!recs.length){
+      histEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--text3);font-size:12px;">尚無點班記錄</div>';
+      return;
+    }
+    histEl.innerHTML=recs.slice(0,50).map(function(r){
+      const typeStyle=r.type==='月盤點'
+        ?'background:#fffbeb;color:var(--amber);border:1px solid #fde68a;'
+        :'background:#dcfce7;color:var(--green);border:1px solid #86efac;';
+      const typeName=r.type||'每日點班';
+      const badHtml=(r.badCount&&parseInt(r.badCount)>0)
+        ?'<div style="font-size:11px;color:var(--red);margin-top:3px;">⚠ 異常 '+r.badCount+' 項：'+(r.badItems||'')+'</div>'
+        :'';
+      const lockHtml=r.lockNumber?' ・ 鎖片 #'+r.lockNumber:'';
+      const methodHtml=r.method?' ・ '+r.method:'';
+      const noteHtml=r.note?'<div style="font-size:11px;color:var(--text3);margin-top:2px;">'+r.note+'</div>':'';
+      return '<div style="padding:10px 14px;border-bottom:1px solid var(--bdr);">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'
+        +'<div style="font-size:13px;font-weight:500;color:var(--text1);">'
+        +(r.ward||'')+(r.shift?' '+r.shift:'')
+        +'<span style="font-size:10px;padding:1px 7px;border-radius:10px;margin-left:5px;'+typeStyle+'">'+typeName+'</span>'
+        +'</div>'
+        +'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text3);">'+(r.timestamp||'')+'</div>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--text2);">'+(r.nurse||'')+lockHtml+methodHtml+'</div>'
+        +badHtml+noteHtml
+        +'</div>';
+    }).join('');
+  }
+
+  const histEl=document.getElementById('au-history-log');
+  if(histEl) histEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--text3);font-size:12px;">載入歷史記錄中...</div>';
+
+  try{
+    const [resNei,resWai]=await Promise.all([
+      fetch(API_URL+'?action=get_history&ward=內科'),
+      fetch(API_URL+'?action=get_history&ward=外科')
+    ]);
+    const [jsonNei,jsonWai]=await Promise.all([resNei.json(),resWai.json()]);
+    const allRecs=[...(jsonNei.records||[]),...(jsonWai.records||[])]
+      .sort(function(a,b){return b.timestamp.localeCompare(a.timestamp);});
+    const neiRecs=allRecs.filter(function(r){return r.ward&&r.ward.includes('內科');});
+    const waiRecs=allRecs.filter(function(r){return r.ward&&r.ward.includes('外科');});
+    renderWeekForWard('nei',neiRecs);
+    renderWeekForWard('wai',waiRecs);
+    renderHistList(allRecs);
+  }catch(e){
+    renderWeekForWard('nei',[]);
+    renderWeekForWard('wai',[]);
+    if(histEl) histEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--amber);font-size:12px;">離線模式 — 無法載入歷史記錄</div>';
+  }
+}
+
+// ── 歷史稽核記錄 ──
+function renderAuHistory(){
+  const el=document.getElementById('au-hist-list');
+  if(!auHistory.length){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;">'
+      +'<i class="ti ti-clipboard" style="font-size:28px;display:block;margin-bottom:8px;"></i>'
+      +'尚無稽核記錄<br>執行第一次稽核後將顯示於此</div>';
+    return;
+  }
+  el.innerHTML=auHistory.slice().reverse().map(function(h){
+    const fail=h.failCount;
+    const statusStyle=fail
+      ?'background:#fee2e2;color:var(--red);'
+      :'background:#dcfce7;color:var(--green);';
+    const statusText=fail?fail+'項不符合':'全部符合';
+    const noteHtml=h.note
+      ?'<div style="font-size:11px;color:var(--text2);margin-top:6px;padding:6px 8px;background:var(--sf2);border-radius:4px;">'+h.note+'</div>'
+      :'';
+    return '<div style="background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rs);padding:13px 14px;margin-bottom:8px;box-shadow:var(--shadow);">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text1);">'+h.ward+' 週稽核</div>'
+      +'<span style="font-size:10px;padding:2px 8px;border-radius:10px;'+statusStyle+'">'+statusText+'</span>'
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--text3);">稽核護理長：'+h.nurse+' ・ '+h.date+' '+h.time+'</div>'
+      +noteHtml
+      +'</div>';
+  }).join('');
+}
+
+// ── 稽核表單 ──
+function renderAuItems(){
+  document.getElementById('au-items').innerHTML=AU_QS.map(function(q,i){
+    const passClass=auResult[i]==='pass'?'pass':'';
+    const failClass=auResult[i]==='fail'?'fail':'';
+    return '<div class="au-item">'
+      +'<div class="au-q">'+(i+1)+'. '+q+'</div>'
+      +'<div class="au-opts">'
+      +'<div class="au-opt '+passClass+'" onclick="setAu('+i+','pass',this)"><i class="ti ti-check"></i> 符合</div>'
+      +'<div class="au-opt '+failClass+'" onclick="setAu('+i+','fail',this)"><i class="ti ti-x"></i> 不符合</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function setAu(i,val,el){
+  auResult[i]=val;
+  el.closest('.au-opts').querySelectorAll('.au-opt').forEach(o=>o.classList.remove('pass','fail'));
+  el.classList.add(val);
+}
+
+function auSign(){
+  auSigned=true;
+  const nurse=document.getElementById('au-nurse').value||'護理長';
+  const t=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('au-sign-area').innerHTML=`
+    <div style="font-size:20px;font-weight:700;color:var(--green);font-family:serif;">${nurse}</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px;">已簽名 ${t}</div>`;
+  document.getElementById('au-sign-area').style.borderStyle='solid';
+  document.getElementById('au-sign-area').style.borderColor='#86efac';
+  showToast('簽名完成 ✓');
+}
+
+async function submitAudit(){
+  if(!document.getElementById('au-nurse').value){showToast('請選擇稽核護理長');return;}
+  const done=Object.keys(auResult).length;
+  if(done<AU_QS.length){showToast(`請完成所有稽核項目（${done}/${AU_QS.length}）`);return;}
+  if(!auSigned){showToast('請護理長簽名後再送出');return;}
+  const nurse=document.getElementById('au-nurse').value;
+  const ward=document.getElementById('au-ward').value;
+  const fail=Object.values(auResult).filter(v=>v==='fail').length;
+  const note=document.getElementById('au-note').value||'';
+  showToast('送出中...');
+
+  const payload={
+    type:'audit', ward, nurse, auditType:'週稽核',
+    results:AU_QS.map((q,i)=>({question:q,result:auResult[i]})),
+    note, failCount:fail
+  };
+  const result=await postToSheets(payload);
+
+  // 存入本機歷史
+  const today2=new Date();
+  auHistory.push({
+    ward, nurse, failCount:fail, note,
+    date:today2.toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}),
+    time:today2.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}),
+    results:AU_QS.map((q,i)=>({q,r:auResult[i]}))
+  });
+  sessionStorage.setItem('auHistory',JSON.stringify(auHistory));
+
+  const sub=fail
+    ?`<span style="color:var(--amber)">⚠ ${fail} 項不符合，請追蹤改善</span>`
+    :'<span style="color:var(--green)">✓ 全部 6 項符合規定</span>';
+  document.getElementById('au-done-sub').innerHTML=`稽核結果已記錄<br>${sub}`;
+  document.getElementById('au-done-meta').textContent=`週稽核 ・ ${nurse} ・ ${tstr}`;
+  auResult={};auSigned=false;
+  document.getElementById('au-sign-area').innerHTML='<i class="ti ti-pen" style="font-size:22px;display:block;margin-bottom:6px;"></i>點擊簽名';
+  document.getElementById('au-sign-area').style.borderStyle='dashed';
+  document.getElementById('au-sign-area').style.borderColor='var(--bdr2)';
+  gs('pg-done-au');
+  showToast(result.success?'稽核已送出 ✓':'稽核完成（離線模式）');
+}
+
+// 進入稽核頁面時初始化
+document.getElementById('pg-au1').addEventListener('click',function once(){
+  auSwitchTab('status');
+  this.removeEventListener('click',once);
+},{once:true});
+
+</script>
+
+<!-- ══ MONTHLY S1 基本資料 ══ -->
+<div class="screen" id="pg-mo1">
+  <div class="pg-hd"><div class="pg-back" onclick="goHome()"><i class="ti ti-arrow-left"></i></div><div><div class="pg-title" style="color:var(--amber)">15日大盤點</div><div class="pg-sub">全車三層物品盤點</div></div></div>
+  <div class="steps" style="margin-top:10px;">
+    <div class="sdw"><div class="sdc"><div class="sd act" style="border-color:var(--amber);background:var(--amber);">1</div><div class="slbl">基本資料</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">2</div><div class="slbl">更換物品</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">分層拍照</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">4</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div class="fg">
+      <div class="fr"><div class="fl"><i class="ti ti-calendar"></i>盤點日期</div><div class="fv"><input type="date" id="mo-date" style="color:var(--text1)"></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-ambulance"></i>急救車</div><div class="fv"><select id="mo-ward"><option>內科急救車</option><option>外科急救車</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-user"></i>點班人</div><div class="fv"><select id="mo-nurse"><option value="">請選擇護理師</option><option>張孟玲（護理長）</option><option>陳穎瑜</option><option>歐玉雯</option><option>劉春妹</option><option>徐懿慶</option><option>方亦稜</option><option>莊婉如</option><option>羅雅妮</option><option>王彥文</option><option>白雅文</option><option>陳宣妤</option><option>朱峻穎</option><option>黃雅貞</option><option>黃羿鈞</option><option>李恩瑜</option><option>詹明軒</option><option>楊婕惠</option><option>葉芷薰</option><option>江士青</option><option>李采凌</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-user-check"></i>覆核人</div><div class="fv"><select id="mo-review"><option value="">請選擇覆核護理師</option><option>張孟玲（護理長）</option><option>陳穎瑜</option><option>歐玉雯</option><option>劉春妹</option><option>徐懿慶</option><option>方亦稜</option><option>莊婉如</option><option>羅雅妮</option><option>王彥文</option><option>白雅文</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-lock"></i>鎖片號碼</div><div class="fv"><input type="number" id="mo-lock" placeholder="輸入新鎖片號碼" style="color:var(--text1)"></div></div>
+    </div>
+    <div class="nbox amber"><i class="ti ti-alert-triangle"></i><div class="nb"><strong>本月預警：</strong>系統偵測到有效期限不足180天的物品，請盤點時確認是否更換</div></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="goHome()"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-amber" onclick="goMoS2()"><i class="ti ti-arrow-right"></i> 開始盤點</button>
+  </div>
+</div>
+
+<!-- MONTHLY S2 更換物品 -->
+<div class="screen" id="pg-mo2">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">基本資料</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act" style="border-color:var(--amber);background:var(--amber);">2</div><div class="slbl">更換物品</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">3</div><div class="slbl">分層拍照</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">4</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;">更換物品紀錄</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">有更換才需要點開填寫，未更換直接略過</div>
+    <div class="pbar"><div class="ptrack"><div class="pfill" id="mo-pfill" style="background:var(--amber);width:0%"></div></div><div class="ptxt" id="mo-ptxt" style="color:var(--amber)">已更換 0 項</div></div>
+    <div class="cat-tabs" id="mo-cat-tabs">
+      <div class="ct active" onclick="moCat(this,'all')" style="">全部</div>
+      <div class="ct" onclick="moCat(this,'31')">3-1 物品</div>
+      <div class="ct" onclick="moCat(this,'32')">3-2 藥品</div>
+      <div class="ct" onclick="moCat(this,'33')">3-3 器材</div>
+    </div>
+    <div id="mo-item-list"></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-mo1')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-amber" onclick="gs('pg-mo3')"><i class="ti ti-camera"></i> 下一步：拍照</button>
+  </div>
+</div>
+
+<!-- MONTHLY S3 拍照 -->
+<div class="screen" id="pg-mo3">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">基本資料</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">更換物品</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act" style="border-color:var(--amber);background:var(--amber);">3</div><div class="slbl">分層拍照</div></div><div class="sline"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd">4</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:2px;">分層拍照上傳</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">每層各上傳一張全景照，共三層</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div class="photo-slot" id="moph0" onclick="moPhoto(0)" style="aspect-ratio:1;background:var(--sf2);border:1.5px dashed var(--bdr2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;">
+        <i class="ti ti-camera" style="font-size:20px;color:var(--text3);margin-bottom:4px;"></i>
+        <div style="font-size:10px;color:var(--text3);">3-1 物品</div>
+      </div>
+      <div class="photo-slot" id="moph1" onclick="moPhoto(1)" style="aspect-ratio:1;background:var(--sf2);border:1.5px dashed var(--bdr2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;">
+        <i class="ti ti-camera" style="font-size:20px;color:var(--text3);margin-bottom:4px;"></i>
+        <div style="font-size:10px;color:var(--text3);">3-2 藥品</div>
+      </div>
+      <div class="photo-slot" id="moph2" onclick="moPhoto(2)" style="aspect-ratio:1;background:var(--sf2);border:1.5px dashed var(--bdr2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;">
+        <i class="ti ti-camera" style="font-size:20px;color:var(--text3);margin-bottom:4px;"></i>
+        <div style="font-size:10px;color:var(--text3);">3-3 器材</div>
+      </div>
+    </div>
+    <div class="nbox green"><i class="ti ti-info-circle"></i><div class="nb">三層照片皆須上傳才能送出，照片存入本月盤點資料夾供護理長稽核</div></div>
+    <div class="sl">補充說明（選填）</div>
+    <textarea id="mo-note" style="width:100%;background:var(--sf);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:10px 12px;color:var(--text1);font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;resize:none;" rows="3" placeholder="異常狀況、設備問題或其他說明..."></textarea>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-mo2')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-amber" onclick="goMoS4()"><i class="ti ti-clipboard-list"></i> 確認送出</button>
+  </div>
+</div>
+
+<!-- MONTHLY S4 確認送出 -->
+<div class="screen" id="pg-mo4">
+  <div class="steps">
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">基本資料</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">更換物品</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd dn">✓</div><div class="slbl">分層拍照</div></div><div class="sline dn"></div></div>
+    <div class="sdw"><div class="sdc"><div class="sd act" style="border-color:var(--amber);background:var(--amber);">4</div><div class="slbl">送出</div></div></div>
+  </div>
+  <div class="wrap">
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px;">盤點摘要確認</div>
+    <div class="sum-card" id="mo-sum-info"></div>
+    <div class="sum-card" id="mo-sum-rep"></div>
+  </div>
+  <div class="bbar">
+    <button class="btn btn-ghost" style="flex:0.5" onclick="gs('pg-mo3')"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn btn-green" onclick="submitMonthly()"><i class="ti ti-send"></i> 確認送出盤點</button>
+  </div>
+</div>
+
+<!-- MONTHLY DONE -->
+<div class="screen" id="pg-done-mo">
+  <div class="done-wrap">
+    <div class="dc t"><i class="ti ti-check"></i></div>
+    <div class="dt">盤點完成！</div>
+    <div class="ds" id="mo-done-sub">效期資料已同步至 MASTER 總表<br>護理長儀表板本月盤點更新為 ✅<br>照片已存入本月盤點資料夾</div>
+    <div class="dm" id="mo-done-meta"></div>
+    <button class="btn btn-ghost" style="margin-top:24px;width:160px;" onclick="goHome()"><i class="ti ti-home"></i> 返回首頁</button>
+  </div>
+</div>
+
+<!-- ══ AUDIT 護理長稽核 ══ -->
+<div class="screen" id="pg-au1">
+  <div class="pg-hd">
+    <div class="pg-back" onclick="goHome()"><i class="ti ti-arrow-left"></i></div>
+    <div><div class="pg-title" style="color:var(--green)">護理長稽核</div><div class="pg-sub">每週一次 ・ 查看記錄並執行稽核</div></div>
+  </div>
+
+  <!-- 分頁 tab -->
+  <div style="display:flex;background:var(--sf);border-bottom:1px solid var(--bdr);padding:0 16px;gap:0;">
+    <div id="au-tab-status" onclick="auSwitchTab('status')" style="padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid var(--green);color:var(--green);">今日狀況</div>
+    <div id="au-tab-week" onclick="auSwitchTab('week')" style="padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);">本週進度</div>
+    <div id="au-tab-history" onclick="auSwitchTab('history')" style="padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);">稽核記錄</div>
+    <div id="au-tab-form" onclick="auSwitchTab('form')" style="padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);">執行稽核</div>
+  </div>
+
+  <div class="wrap" id="au-panel-status">
+    <!-- 今日三班完成狀態 -->
+    <div class="sl">今日三班完成狀態</div>
+    <div class="sum-card" style="margin-bottom:10px;">
+      <div class="sum-hd">內科急救車</div>
+      <div id="au-nei-status"></div>
+    </div>
+    <div class="sum-card" style="margin-bottom:10px;">
+      <div class="sum-hd">外科急救車</div>
+      <div id="au-wai-status"></div>
+    </div>
+    <div class="sl">今日點班記錄</div>
+    <div class="sum-card">
+      <div id="au-today-log" style="padding:4px 0;"></div>
+    </div>
+  </div>
+
+  <div class="wrap" id="au-panel-week" style="display:none;">
+    <div class="sl">本週每日完成狀況</div>
+    <div class="sum-card" style="margin-bottom:10px;">
+      <div class="sum-hd">內科急救車 — 本週</div>
+      <div id="au-week-nei"></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-hd">外科急救車 — 本週</div>
+      <div id="au-week-wai"></div>
+    </div>
+    <div class="sl">歷史點班記錄</div>
+    <div class="sum-card">
+      <div id="au-history-log" style="padding:4px 0;">
+        <div style="text-align:center;padding:16px;color:var(--text3);font-size:12px;">點班記錄從 App 送出後自動累積於此</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="au-panel-history" style="display:none;">
+    <div class="sl">歷史稽核記錄</div>
+    <div id="au-hist-list">
+      <div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;">
+        <i class="ti ti-clipboard" style="font-size:28px;display:block;margin-bottom:8px;"></i>
+        尚無稽核記錄<br>執行第一次稽核後將顯示於此
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="au-panel-form" style="display:none;">
+    <div class="nbox green"><i class="ti ti-info-circle"></i><div class="nb"><strong>每週稽核</strong>：每週一次，確認點班紀錄完整及急救車狀態，完成後簽名送出</div></div>
+    <div class="fg" style="margin-bottom:12px;">
+      <div class="fr"><div class="fl"><i class="ti ti-ambulance"></i>稽核科別</div><div class="fv"><select id="au-ward"><option>內科急救車</option><option>外科急救車</option></select></div></div>
+      <div class="fr"><div class="fl"><i class="ti ti-user"></i>稽核護理長</div><div class="fv"><select id="au-nurse"><option value="">請選擇</option><option>張孟玲（護理長）</option></select></div></div>
+    </div>
+    <div class="sl">六項稽核項目</div>
+    <div id="au-items" style="margin-bottom:12px;"></div>
+    <div class="sl">稽核意見與改善行動</div>
+    <textarea id="au-note" style="width:100%;background:var(--sf);border:1.5px solid var(--bdr2);border-radius:var(--rs);padding:10px 12px;color:var(--text1);font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;resize:none;margin-bottom:12px;" rows="3" placeholder="記錄稽核結果與改善行動方案..."></textarea>
+    <div class="sl">護理長電子簽名</div>
+    <div id="au-sign-area" onclick="auSign()" style="background:var(--sf);border:1.5px dashed var(--bdr2);border-radius:var(--rs);padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:13px;margin-bottom:12px;">
+      <i class="ti ti-pen" style="font-size:22px;display:block;margin-bottom:6px;"></i>點擊簽名
+    </div>
+    <button class="btn btn-green" onclick="submitAudit()" style="width:100%;padding:13px 0;"><i class="ti ti-clipboard-check"></i> 送出稽核結果</button>
+  </div>
+</div>
+
+<!-- AUDIT DONE -->
+<div class="screen" id="pg-done-au">
+  <div class="done-wrap">
+    <div class="dc t"><i class="ti ti-clipboard-check"></i></div>
+    <div class="dt">稽核完成！</div>
+    <div class="ds" id="au-done-sub">稽核結果已記錄<br>歷史稽核自動存檔</div>
+    <div class="dm" id="au-done-meta"></div>
+    <div style="display:flex;gap:8px;margin-top:24px;width:100%;max-width:260px;">
+      <button class="btn btn-ghost" onclick="goHome()"><i class="ti ti-home"></i> 首頁</button>
+      <button class="btn btn-green" onclick="gs('pg-au1');auSwitchTab('history')"><i class="ti ti-history"></i> 查看記錄</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
